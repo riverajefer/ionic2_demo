@@ -1,0 +1,28 @@
+<ion-header>
+  <ion-navbar>
+    <button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>  
+    <ion-title>carnes</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+
+
+<ion-list>
+	<button ion-item *ngFor="let carne of carnes">
+	    <ion-icon name="pizza" item-left></ion-icon>
+   	    <h2>{{ carne.titulo }}</h2>
+      	<ion-icon ios="ios-arrow-forward" md="md-arrow-forward" item-right></ion-icon>
+		
+	</button> 
+</ion-list>
+
+		
+				
+
+
+</ion-content>
