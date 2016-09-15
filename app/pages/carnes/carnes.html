@@ -13,7 +13,7 @@
 
 
 <ion-list>
-	<button ion-item *ngFor="let carne of carnes">
+	<button ion-item *ngFor="let carne of carnes" (click)="goToDetalles($event, carne.id)">
 	    <ion-icon name="pizza" item-left></ion-icon>
    	    <h2>{{ carne.titulo }}</h2>
       	<ion-icon ios="ios-arrow-forward" md="md-arrow-forward" item-right></ion-icon>

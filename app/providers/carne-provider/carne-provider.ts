@@ -37,5 +37,16 @@ export class CarneProvider {
   		);
   	});
   }
+
+  loadDetalles(id:number){
+    console.log(id)
+    return new Promise<Carne>(resolve =>{
+      this.http.get('https://blooming-retreat-58545.herokuapp.com/carne/'+id)
+      .map(res => <Carne>(res.json()))
+      .subscribe(carne=>{
+        resolve(carne);
+      });
+    });
+  }
 }
 
