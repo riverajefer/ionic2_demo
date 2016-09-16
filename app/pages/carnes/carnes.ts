@@ -4,7 +4,6 @@ import { CarneProvider } from '../../providers/carne-provider/carne-provider';
 import { CarneDetallesPage } from '../carne-detalles/carne-detalles';
 import {Carne} from '../../models/carne'
 
-
 @Component({
   templateUrl: 'build/pages/carnes/carnes.html',
   providers: [CarneProvider]
@@ -60,30 +59,25 @@ export class CarnesPage {
 })
 
 class ModalsContentPage {
+  cp:CarnesPage;
+  carnes: Carne[];
 
   constructor(
       public platform: Platform,
       public viewCtrl: ViewController,
       private carneProvider: CarneProvider
-  ) {
-   
-  }
+  ) { }
+
 
   dismiss() {
     this.viewCtrl.dismiss();
   }
 
-  todo = {}
   carne = {}
-  logForm() {
-    console.log(this.todo)
-  }
 
   submitForm(){
-  	console.log(this.carne)
-  	this.carneProvider.newCarne(this.carne);
-	 
-
+  	this.carneProvider.newCarne(this.carne).then( carnes =>  this.carnes = carnes);
+  	this.dismiss();
   }
 
 }

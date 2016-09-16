@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 import { LoadingController } from 'ionic-angular';
-import 'rxjs/add/operator/map';
 import {Carne} from '../../models/carne'
+import 'rxjs/add/operator/map';
 
 @Injectable()
 export class CarneProvider {
@@ -37,18 +37,18 @@ export class CarneProvider {
 	  			this.data = carnes;
 	  			resolve(this.data);
   			},
-  			function(error) { console.log("Error happened" + error)},
-  			function() { console.log("the subscription is completed"); self_loader.dismiss();}
+  			 function(error) { console.log("Error happened" + error)},
+  			 function() { console.log("the subscription is completed"); 
+         self_loader.dismiss();
+       }
   		);
   	});
   }
 
   loadDetalles(id:number){
 
-
     this.loader.present()
 
-    console.log(id)
     return new Promise<Carne>(resolve =>{
 
       var self_loader = this.loader;
@@ -58,8 +58,10 @@ export class CarneProvider {
       .subscribe(carne=>{
         resolve(carne);
       },
-		function(error) { console.log("Error happened" + error)},
-		function() { console.log("the subscription is completed"); self_loader.dismiss();}      
+		    function(error) { console.log("Error happened" + error)},
+		    function() { console.log("the subscription is completed"); 
+        self_loader.dismiss();
+      }      
       );
     });
   }
@@ -73,8 +75,6 @@ export class CarneProvider {
   		.map(res => <Array<Carne>>(res.json().items))
   		.subscribe(carnes => {
   			resolve(carnes);
-  			//this.data = carnes;
-  			resolve(this.data);
   		},
 		function(error) { console.log("Error happened" + error)},
 		function() { console.log("the subscription is completed"); self_loader.dismiss()}
@@ -84,27 +84,23 @@ export class CarneProvider {
   }  
 
   newCarne(carne:Object){
-  	console.log(carne);
-
-  	var self_loader = this.loader;
 
   	return new Promise<Array<Carne>>(resolve =>{
-  		this.http.post('http://192.168.0.6/blooming-retreat-58545/public/carne', carne)
-  		.map(res => <Array<Carne>>(res.json().items))
-  		.subscribe(carnes => {
-  			resolve(carnes);
-  			//this.data = carnes;
-  			resolve(this.data);
-  		},
-		function(error) { console.log("Error happened" + error)},
-		function() { console.log("the subscription is completed"); self_loader.dismiss()}
-  		);
+  		this.http.post('https://blooming-retreat-58545.herokuapp.com/carne', carne)
+      .map(res => <Array<Carne>>res.json())
+      .subscribe
+      (
+        carnes => {
+          this.data = carnes;
+          resolve(this.data);
+        },
+        function(error) { console.log("Error happened" + error)},
+        function() { console.log("the subscription is completed")}
+      );
 
   	});
 
-
   }
-
 
 }
 
