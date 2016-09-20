@@ -1,83 +1,74 @@
 import { Component} from '@angular/core';
-import { NavController, NavParams, ModalController, ViewController, Platform } from 'ionic-angular';
+import { NavController, NavParams, ModalController, ViewController, Platform, LoadingController } from 'ionic-angular';
 import { CarneProvider } from '../../providers/carne-provider/carne-provider';
 import { CarneDetallesPage } from '../carne-detalles/carne-detalles';
-import {Carne} from '../../models/carne'
+import { Carne } from '../../models/carne'
+import { ModalPage } from '../modal/modal';
+//import { CARNES } from '../../pages/carnes/mock-carne';
 
 @Component({
   templateUrl: 'build/pages/carnes/carnes.html',
-  providers: [CarneProvider]
+  providers: [CarneProvider],
 })
+
 export class CarnesPage {
-  
+
   carnes: Carne[];
 
-  constructor(private navCtrl: NavController, private carneProvider: CarneProvider, public modalCtrl: ModalController) {
+  newCarne: Carne = new Carne();  
 
-  	this.loadAll()
+  errorMessage:any;
+  
+  public loader;
 
+  constructor(private navCtrl: NavController, 
+    private carneProvider: CarneProvider, 
+    public modalCtrl: ModalController,
+    public loadingCtrl: LoadingController
+    ) {
+    this.getCarnes();
+    this.navCtrl = navCtrl;
+
+    this.loader = this.loadingCtrl.create({
+      content: "Please wait...",
+    });
   }
 
-  loadAll(){
-  	 this.carneProvider.load().then(
-  		carnes => {this.carnes = carnes.data
-  	});
+
+  getCarnes() {
+    let loader = this.loadingCtrl.create({
+      content: "Please wait...",
+    });    
+    loader.present();
+    this.carneProvider.getCarnes()
+    .subscribe(carnes => {this.carnes = carnes; loader.dismiss()},  error =>  this.errorMessage = <any>error );
+  }
+
+  presentModal() {
+
+    let modal = this.modalCtrl.create(ModalPage, { userId: 8675309 });
+
+    modal.onDidDismiss(carne => {
+      if(carne!=null){
+          this.loader.present();
+          this.carneProvider.addCarne(carne)
+          .subscribe(
+            carne  =>{
+              this.carnes.unshift(carne);
+              this.loader.dismiss();
+            },
+            error =>  this.errorMessage = <any>error);    
+      }
+    }); 
+
+    modal.present();    
   }
 
   goToDetalles(event, id){
-  	this.navCtrl.push(CarneDetallesPage,{
-  		id:id
-  	});
-  }
-
-
-  search(searchTerm){
-
-  	let term = searchTerm.target.value;
-  	console.log(term)
- 	if (term.trim() == '' || term.trim().length < 3) {
-  		term = 'all';
-  	}
-
-	this.carneProvider.searchCarne(term)
-  		.then(carnes => this.carnes =carnes)
-
-  }
-
-   presentModal() {
-   	console.log('Modal');
-    let modal = this.modalCtrl.create(ModalsContentPage);
-    modal.present();
+    this.navCtrl.push(CarneDetallesPage,{
+      id:id
+    });
   }
 
 }
 
-
-@Component({
-    templateUrl: 'build/pages/carnes/modal-content.html',
-    providers: [CarneProvider]
-})
-
-class ModalsContentPage {
-  cp:CarnesPage;
-  carnes: Carne[];
-
-  constructor(
-      public platform: Platform,
-      public viewCtrl: ViewController,
-      private carneProvider: CarneProvider
-  ) { }
-
-
-  dismiss() {
-    this.viewCtrl.dismiss();
-  }
-
-  carne = {}
-
-  submitForm(){
-  	this.carneProvider.newCarne(this.carne).then( carnes =>  this.carnes = carnes);
-  	this.dismiss();
-  }
-
-}

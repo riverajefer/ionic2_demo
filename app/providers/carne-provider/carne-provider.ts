@@ -1,14 +1,19 @@
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
+import { Http, Response } from '@angular/http';
 import { LoadingController } from 'ionic-angular';
-import {Carne} from '../../models/carne'
+import { Carne } from '../../models/carne'
+import { Observable } from 'rxjs/Observable';
+import { CARNES } from '../../pages/carnes/mock-carne';
 import 'rxjs/add/operator/map';
+import 'rxjs/Rx';
 
 @Injectable()
 export class CarneProvider {
 
+  carnes: Carne[] = CARNES;
   data: any;
   public loader;
+
   constructor(private http: Http, public loadingCtrl: LoadingController) {
   	this.data = null;
     this.loader = this.loadingCtrl.create({
@@ -17,32 +22,47 @@ export class CarneProvider {
 
   }
 
-  load(){
-    
-    this.loader.present()
+  carnesUrl = 'https://blooming-retreat-58545.herokuapp.com/carne';  // URL to web API
 
-  	if(this.data){
-  		return Promise.resolve(this.data);
-  	}
+  getCarnes (): Observable<Carne[]> {
+    return this.http.get(this.carnesUrl)
+                    .map(this.extractData)
+                    .catch(this.handleError);
+  }
 
-  	return new Promise(resolve => {
+  addCarne (carne:Object): Observable<Carne> {
+    return this.http.post(this.carnesUrl, carne)
+    .map(this.extractDataNew)
+    .catch(this.handleError);
 
-  		var self_loader = this.loader;
+  };
 
-  		this.http.get('https://blooming-retreat-58545.herokuapp.com/carne')
-  		.map(res => <Array<Carne>>res.json())
-  		.subscribe
-  		(
-  			carnes => {
-	  			this.data = carnes;
-	  			resolve(this.data);
-  			},
-  			 function(error) { console.log("Error happened" + error)},
-  			 function() { console.log("the subscription is completed"); 
-         self_loader.dismiss();
-       }
-  		);
-  	});
+  private extractData(res: Response) {
+    let body = res.json();
+    this.carnes = body.data;
+    return body.data || { };
+  }
+
+
+  private extractDataNew(res: Response) {
+    let body = res.json();
+    console.log(body)
+    return body || { };
+  }
+
+  private handleError (error: any) {
+    // In a real world app, we might use a remote logging infrastructure
+    // We'd also dig deeper into the error to get a better message
+    let errMsg = (error.message) ? error.message :
+      error.status ? `${error.status} - ${error.statusText}` : 'Server error';
+    console.error(errMsg); // log to console instead
+    return Observable.throw(errMsg);
+  }
+
+  
+
+  getAll(): Carne[]{
+      return this.carnes;
   }
 
   loadDetalles(id:number){
@@ -64,42 +84,6 @@ export class CarneProvider {
       }      
       );
     });
-  }
-
-  searchCarne(searchParam: string){
-
-  	var self_loader = this.loader;
-
-  	return new Promise<Array<Carne>>(resolve =>{
-  		this.http.get('http://blooming-retreat-58545.herokuapp.com/carne/buscar/'+searchParam)
-  		.map(res => <Array<Carne>>(res.json().items))
-  		.subscribe(carnes => {
-  			resolve(carnes);
-  		},
-		function(error) { console.log("Error happened" + error)},
-		function() { console.log("the subscription is completed"); self_loader.dismiss()}
-  		);
-
-  	});
-  }  
-
-  newCarne(carne:Object){
-
-  	return new Promise<Array<Carne>>(resolve =>{
-  		this.http.post('https://blooming-retreat-58545.herokuapp.com/carne', carne)
-      .map(res => <Array<Carne>>res.json())
-      .subscribe
-      (
-        carnes => {
-          this.data = carnes;
-          resolve(this.data);
-        },
-        function(error) { console.log("Error happened" + error)},
-        function() { console.log("the subscription is completed")}
-      );
-
-  	});
-
   }
 
 }

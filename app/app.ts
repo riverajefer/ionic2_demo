@@ -5,9 +5,14 @@ import { StatusBar } from 'ionic-native';
 import { Page1 } from './pages/page1/page1';
 import { Page2 } from './pages/page2/page2';
 import { CarnesPage } from './pages/carnes/carnes';
+import { ModalPage } from "./pages/modal/modal";
+
+import { CarneProvider } from './providers/carne-provider/carne-provider';
 
 @Component({
-  templateUrl: 'build/app.html'
+  templateUrl: 'build/app.html',
+    providers: [CarneProvider],
+  directives: [ModalPage],
 })
 class MyApp {
   @ViewChild(Nav) nav: Nav;
